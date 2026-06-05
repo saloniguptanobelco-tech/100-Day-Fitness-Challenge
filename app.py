@@ -63,24 +63,7 @@ def trigger_confetti():
 def draw_svg_gauge(score, color_hex):
     pct = score / 100.0
     offset = 502.6 * (1.0 - pct)
-    svg = f"""
-    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
-    <svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;">
-        <!-- Background track -->
-        <circle cx="100" cy="100" r="80" stroke="rgba(255, 255, 255, 0.05)" stroke-width="14" fill="none"/>
-        
-        <!-- Active track -->
-        <circle cx="100" cy="100" r="80" stroke="{color_hex}" stroke-width="14" 
-                stroke-dasharray="502.6" stroke-dashoffset="{offset}" stroke-linecap="round" fill="none" 
-                transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 8px {color_hex}); transition: stroke-dashoffset 0.5s ease;"/>
-                
-        <!-- Inner Details -->
-        <text x="100" y="85" fill="#A1A1AA" font-size="10" font-family="'Poppins', sans-serif" font-weight="600" text-anchor="middle" letter-spacing="1">FITNESS SCORE</text>
-        <text x="100" y="130" fill="#FFFFFF" font-size="42" font-family="'Poppins', sans-serif" font-weight="800" text-anchor="middle">{score}</text>
-        <text x="100" y="150" fill="{color_hex}" font-size="11" font-family="'Poppins', sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.5">/ 100 PTS</text>
-    </svg>
-    </div>
-    """
+    svg = f'<div style="display:flex;justify-content:center;align-items:center;padding:20px;"><svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;"><circle cx="100" cy="100" r="80" stroke="rgba(255,255,255,0.05)" stroke-width="14" fill="none"/><circle cx="100" cy="100" r="80" stroke="{color_hex}" stroke-width="14" stroke-dasharray="502.6" stroke-dashoffset="{offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 8px {color_hex});transition:stroke-dashoffset 0.5s ease;"/><text x="100" y="85" fill="#A1A1AA" font-size="10" font-family="\'Poppins\',sans-serif" font-weight="600" text-anchor="middle" letter-spacing="1">FITNESS SCORE</text><text x="100" y="130" fill="#FFFFFF" font-size="42" font-family="\'Poppins\',sans-serif" font-weight="800" text-anchor="middle">{score}</text><text x="100" y="150" fill="{color_hex}" font-size="11" font-family="\'Poppins\',sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.5">/ 100 PTS</text></svg></div>'
     return svg
 
 def draw_activity_rings(mission):
@@ -94,33 +77,7 @@ def draw_activity_rings(mission):
     water_offset = 314.2 * (1.0 - water_pct)
     sleep_offset = 219.9 * (1.0 - sleep_pct)
     
-    html = f"""
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
-        <svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;">
-            <!-- Steps Ring (Green) -->
-            <circle cx="100" cy="100" r="80" stroke="rgba(34, 197, 94, 0.08)" stroke-width="12" fill="none"/>
-            <circle cx="100" cy="100" r="80" stroke="#22C55E" stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="{steps_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #22C55E);"/>
-            
-            <!-- Workout Ring (Purple) -->
-            <circle cx="100" cy="100" r="65" stroke="rgba(124, 58, 237, 0.08)" stroke-width="12" fill="none"/>
-            <circle cx="100" cy="100" r="65" stroke="#7C3AED" stroke-width="12" stroke-dasharray="408.4" stroke-dashoffset="{workout_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #7C3AED);"/>
-            
-            <!-- Hydration Ring (Cyan) -->
-            <circle cx="100" cy="100" r="50" stroke="rgba(0, 212, 255, 0.08)" stroke-width="12" fill="none"/>
-            <circle cx="100" cy="100" r="50" stroke="#00D4FF" stroke-width="12" stroke-dasharray="314.2" stroke-dashoffset="{water_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #00D4FF);"/>
-            
-            <!-- Sleep Ring (Yellow) -->
-            <circle cx="100" cy="100" r="35" stroke="rgba(234, 179, 8, 0.08)" stroke-width="12" fill="none"/>
-            <circle cx="100" cy="100" r="35" stroke="#EAB308" stroke-width="12" stroke-dasharray="219.9" stroke-dashoffset="{sleep_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #EAB308);"/>
-        </svg>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; justify-content: center; font-size: 11px;">
-            <span style="color:#22C55E;">● Steps ({int(steps_pct*100)}%)</span>
-            <span style="color:#7C3AED;">● Workout ({int(workout_pct*100)}%)</span>
-            <span style="color:#00D4FF;">● Water ({int(water_pct*100)}%)</span>
-            <span style="color:#EAB308;">● Sleep ({int(sleep_pct*100)}%)</span>
-        </div>
-    </div>
-    """
+    html = f'<div style="display:flex;justify-content:center;align-items:center;flex-direction:column;padding:20px;"><svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;"><circle cx="100" cy="100" r="80" stroke="rgba(34,197,94,0.08)" stroke-width="12" fill="none"/><circle cx="100" cy="100" r="80" stroke="#22C55E" stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="{steps_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 4px #22C55E);"/><circle cx="100" cy="100" r="65" stroke="rgba(124,58,237,0.08)" stroke-width="12" fill="none"/><circle cx="100" cy="100" r="65" stroke="#7C3AED" stroke-width="12" stroke-dasharray="408.4" stroke-dashoffset="{workout_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 4px #7C3AED);"/><circle cx="100" cy="100" r="50" stroke="rgba(0,212,255,0.08)" stroke-width="12" fill="none"/><circle cx="100" cy="100" r="50" stroke="#00D4FF" stroke-width="12" stroke-dasharray="314.2" stroke-dashoffset="{water_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 4px #00D4FF);"/><circle cx="100" cy="100" r="35" stroke="rgba(234,179,8,0.08)" stroke-width="12" fill="none"/><circle cx="100" cy="100" r="35" stroke="#EAB308" stroke-width="12" stroke-dasharray="219.9" stroke-dashoffset="{sleep_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 4px #EAB308);"/></svg><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;justify-content:center;font-size:11px;"><span style="color:#22C55E;">● Steps ({int(steps_pct*100)}%)</span><span style="color:#7C3AED;">● Workout ({int(workout_pct*100)}%)</span><span style="color:#00D4FF;">● Water ({int(water_pct*100)}%)</span><span style="color:#EAB308;">● Sleep ({int(sleep_pct*100)}%)</span></div></div>'
     return html
 
 def draw_svg_radar(values):
@@ -165,15 +122,7 @@ def draw_svg_radar(values):
         
     active_poly = f'<polygon points="{" ".join(active_pts)}" fill="rgba(0, 212, 255, 0.15)" stroke="#00D4FF" stroke-width="2" style="filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.4));"/>'
     
-    svg = f"""
-    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
-    <svg width="240" height="240" viewBox="0 0 200 200" style="background:transparent;">
-        {"".join(grid_polygons)}
-        {active_poly}
-        {"".join(label_elements)}
-    </svg>
-    </div>
-    """
+    svg = f'<div style="display:flex;justify-content:center;align-items:center;padding:20px;"><svg width="240" height="240" viewBox="0 0 200 200" style="background:transparent;">{"".join(grid_polygons)}{active_poly}{"".join(label_elements)}</svg></div>'
     return svg
 
 def draw_svg_heatmap(grid_values):
@@ -199,15 +148,36 @@ def draw_svg_heatmap(grid_values):
             x = c_idx * (box_w + gap) + 30
             rects.append(f'<rect x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="3" fill="{color}"><title>Status: {val}</title></rect>')
             
-    svg = f"""
-    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
-    <svg width="220" height="130" viewBox="0 0 200 130" style="background:transparent;">
-        {"".join(headers)}
-        {"".join(rects)}
-    </svg>
-    </div>
-    """
+    svg = f'<div style="display:flex;justify-content:center;align-items:center;padding:20px;"><svg width="220" height="130" viewBox="0 0 200 130" style="background:transparent;">{"".join(headers)}{"".join(rects)}</svg></div>'
     return svg
+
+def get_random_motivation_quote(coach):
+    quotes = {
+        "Nova": [
+            "Data shows that consistency is the primary driver of physiological adaptation.",
+            "Every logged step reduces cardiovascular risk factors by a measurable coefficient.",
+            "Sleep optimization is non-negotiable for protein synthesis and tissue recovery."
+        ],
+        "Atlas": [
+            "Your only limit is the one you set in your mind. Keep moving, you're doing great!",
+            "Small, daily habits build empires. Trust your process and show up for yourself.",
+            "You don't have to be perfect; you just have to start. Today is a fresh victory!"
+        ],
+        "Titan": [
+            "NO EXCUSES! PAIN IS TEMPORARY, PRIDE IS FOREVER! SHOW UP OR SHUT UP!",
+            "REST IS FOR THE WEAK! IF YOU WANT UNCOMMON RESULTS, YOU NEED UNCOMMON EFFORT!",
+            "THE ARENA REWARDS THE GRITTY! DROP AND GIVE ME 20 RIGHT NOW!"
+        ],
+        "Apex": [
+            "High performance requires absolute alignment of training volume, caloric density, and rest.",
+            "Endurance is built when your lungs scream but your mind commands you to hold the pace.",
+            "Train like an athlete, recover like a professional. Precision is everything."
+        ]
+    }
+    import datetime
+    day_of_year = datetime.date.today().timetuple().tm_yday
+    coach_quotes = quotes.get(coach, quotes["Nova"])
+    return coach_quotes[day_of_year % len(coach_quotes)]
 
 # 4. Initialize Session State
 def init_state():
@@ -239,6 +209,7 @@ def init_state():
         st.session_state.current_page = "Home"
         st.session_state.active_coach = "Nova"
         st.session_state.wrapped_slide = 0
+        st.session_state.curated_challenge = None
 
         # Generate 30 days of historical data for analytics
         np.random.seed(42)
@@ -432,8 +403,6 @@ def render_nav_bar():
         unsafe_allow_html=True
     )
     
-    # We use Streamlit columns to render interactive buttons acting as tabs, matching our styled class overrides
-    cols = st.columns(11)
     pages = [
         ("Home", "🏠 Home"),
         ("My Journey", "🏃 My Journey"),
@@ -448,17 +417,24 @@ def render_nav_bar():
         ("Settings", "⚙️ Settings")
     ]
     
-    for idx, (page_key, page_label) in enumerate(pages):
-        with cols[idx]:
-            is_active = (st.session_state.current_page == page_key)
-            # Apply active class wrapper if selected
-            if is_active:
-                st.markdown('<div class="nav-active-btn">', unsafe_allow_html=True)
-            if st.button(page_label, key=f"nav_btn_{page_key}", use_container_width=True):
-                st.session_state.current_page = page_key
-                st.rerun()
-            if is_active:
-                st.markdown('</div>', unsafe_allow_html=True)
+    label_options = [p[1] for p in pages]
+    default_idx = next((i for i, p in enumerate(pages) if p[0] == st.session_state.current_page), 0)
+    
+    # We display st.pills for navigation to keep them perfectly even and prevent narrow Column squishing
+    selected_label = st.pills(
+        "Navigation",
+        options=label_options,
+        default=label_options[default_idx],
+        selection_mode="single",
+        label_visibility="collapsed",
+        key="nav_pills_tab"
+    )
+    
+    if selected_label:
+        selected_page = next(p[0] for p in pages if p[1] == selected_label)
+        if selected_page != st.session_state.current_page:
+            st.session_state.current_page = selected_page
+            st.rerun()
 
 render_nav_bar()
 st.markdown("---")
@@ -493,6 +469,17 @@ def render_poster_html(title, subtitle, meta, badge_text="", badge_type="purple"
 # 8. SUB-PAGE 1: HOME (Netflix Homepage style)
 def show_home():
     st.markdown('<div class="cinematic-title">NOW PLAYING</div>', unsafe_allow_html=True)
+    
+    # Dynamic motivational quote box
+    st.markdown(
+        f"""
+        <div class="glass-card" style="border-left: 4px solid #00D4FF; margin-bottom: 20px; padding: 15px 20px;">
+            <p style="margin: 0; font-style: italic; font-size: 14px; color:#FFFFFF; line-height: 1.4;">"{get_random_motivation_quote(st.session_state.active_coach)}"</p>
+            <p style="margin: 5px 0 0 0; text-align: right; font-size: 10px; color:#A1A1AA; font-weight:700; text-transform:uppercase;">— Coach {st.session_state.active_coach} Guidance</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Continue Your Journey Row
     st.markdown('<div class="section-header">Continue Your Journey <span>→</span></div>', unsafe_allow_html=True)
@@ -580,6 +567,17 @@ def show_home():
 def show_my_journey():
     st.markdown('<div class="cinematic-title">TODAY\'S EPISODE</div>', unsafe_allow_html=True)
     
+    # Dynamic motivational quote box
+    st.markdown(
+        f"""
+        <div class="glass-card" style="border-left: 4px solid #7C3AED; margin-bottom: 20px; padding: 15px 20px;">
+            <p style="margin: 0; font-style: italic; font-size: 14px; color:#FFFFFF; line-height: 1.4;">"{get_random_motivation_quote(st.session_state.active_coach)}"</p>
+            <p style="margin: 5px 0 0 0; text-align: right; font-size: 10px; color:#A1A1AA; font-weight:700; text-transform:uppercase;">— Coach {st.session_state.active_coach} Guidance</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
     p = st.session_state.user_profile
     mission = p["today_mission"]
     
@@ -623,8 +621,8 @@ def show_my_journey():
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.markdown("<h3>🎯 Today's Mission</h3>", unsafe_allow_html=True)
         
-        # 1. Workout Toggle
-        workout_check = st.checkbox("💪 Upper Body Shred Completed (45 mins)", value=mission["workout"])
+        # 1. Workout Toggle (Changed from checkbox to toggle)
+        workout_check = st.toggle("💪 Upper Body Shred Completed (45 mins)", value=mission["workout"])
         if workout_check != mission["workout"]:
             mission["workout"] = workout_check
             if workout_check:
@@ -895,7 +893,7 @@ def show_challenges():
             
     st.markdown("---")
     
-    # 3. AI CHALLENGE GENERATOR
+    # 2. AI CHALLENGE GENERATOR (Fixed nested button bug)
     st.markdown("### 🤖 AI Micro-Challenge Generator")
     st.markdown("Let the AI engine curate a custom daily challenge for you based on current weak points and training volume.")
     
@@ -904,35 +902,100 @@ def show_challenges():
     
     if st.button("CURATE AI MICRO CHALLENGE", use_container_width=True):
         st.toast("AI Coach Nova compiling health logs...")
-        time.sleep(1)
+        time.sleep(0.5)
         
-        # Determine values dynamically
         xp = 500 if diff == "Novice" else 1200 if diff == "Expert" else 2500
         success_rate = 94 if diff == "Novice" else 78 if diff == "Expert" else 52
         
+        st.session_state.curated_challenge = {
+            "name": f"AI {focus} Challenge",
+            "xp": xp,
+            "success_rate": success_rate,
+            "focus": focus,
+            "diff": diff
+        }
+        st.toast("New custom challenge compiled!")
+        st.rerun()
+        
+    if st.session_state.curated_challenge is not None:
+        ch = st.session_state.curated_challenge
         st.markdown(
             f"""
-            <div class="glass-card elite-card" style="margin-top: 15px;">
+            <div class="glass-card elite-card" style="margin-top: 15px; margin-bottom: 15px;">
                 <span style="background: rgba(255, 215, 0, 0.2); color:#FFD700; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase;">GENERATED PLAN</span>
-                <h3 style="margin: 10px 0 5px 0; color:#FFFFFF;">AI {focus} Challenge ({diff})</h3>
+                <h3 style="margin: 10px 0 5px 0; color:#FFFFFF;">{ch['name']} ({ch['diff']})</h3>
                 <p style="margin: 0 0 10px 0; font-size:13px; color:#A1A1AA;">
                     Perform targeted physical workloads. Consistently log metrics. Nova projects this will optimize your cardiovascular recoverability by +4.2%.
                 </p>
                 <div style="display:flex; gap: 20px; font-size: 12px; color:#00D4FF;">
                     <span><b>Duration:</b> 24 Hours</span>
-                    <span><b>Success Probability:</b> {success_rate}%</span>
-                    <span><b>Reward:</b> +{xp} XP</span>
+                    <span><b>Success Probability:</b> {ch['success_rate']}%</span>
+                    <span><b>Reward:</b> +{ch['xp']} XP</span>
                 </div>
             </div>
             """,
             unsafe_allow_html=True
         )
-        if st.button("ACCEPT AND ADD CHALLENGE", key="accept_ai_ch"):
-            st.session_state.joined_challenges.append(f"AI {focus} Challenge")
-            st.session_state.user_profile["xp"] += 100
-            st.toast("Challenge Activated! +100 XP baseline")
-            trigger_confetti()
-            st.rerun()
+        col_acc1, col_acc2 = st.columns(2)
+        with col_acc1:
+            if st.button("👍 ACCEPT AND ADD CHALLENGE", key="accept_ai_ch", use_container_width=True):
+                if ch["name"] not in st.session_state.joined_challenges:
+                    st.session_state.joined_challenges.append(ch["name"])
+                    if not any(c["name"] == ch["name"] for c in st.session_state.challenges_db):
+                        st.session_state.challenges_db.append({
+                            "id": f"c{len(st.session_state.challenges_db)+1}",
+                            "name": ch["name"],
+                            "duration": "24 Hours",
+                            "difficulty": ch["diff"],
+                            "xp": ch["xp"],
+                            "meta": f"AI custom challenge focusing on {ch['focus']}",
+                            "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=400"
+                        })
+                st.session_state.user_profile["xp"] += 100
+                st.toast(f"Challenge Activated! +100 XP baseline")
+                trigger_confetti()
+                st.session_state.curated_challenge = None
+                st.rerun()
+        with col_acc2:
+            if st.button("❌ DISCARD CURATED CHALLENGE", key="discard_ai_ch", use_container_width=True):
+                st.session_state.curated_challenge = None
+                st.rerun()
+
+    st.markdown("---")
+
+    # 3. QUICK FITNESS CHALLENGES (Micro-Challenges)
+    st.markdown("### ⚡ Quick Fitness Micro-Challenges")
+    st.markdown("Instantly complete these small physical or wellness habits to boost your XP and daily score.")
+    micro_cols = st.columns(3)
+    micros = [
+        ("💧 Hydration Burst", "Drink 1 glass of water now.", "+50 XP", 50, "water", 0.25),
+        ("🤸 Stretch Break", "Do a 2-minute dynamic stretching routine.", "+100 XP", 100, "workout", True),
+        ("🏃 Steps Sprint", "Log 500 steps right now.", "+100 XP", 100, "steps", 500)
+    ]
+    for idx, (m_title, m_desc, m_xp, val, m_type, change) in enumerate(micros):
+        with micro_cols[idx]:
+            st.markdown(
+                f"""
+                <div class="glass-card" style="padding: 15px; border-top: 3px solid #00D4FF;">
+                    <h4 style="margin:0; font-size:14px; color:#FFFFFF;">{m_title}</h4>
+                    <p style="margin:5px 0; font-size:11px; color:#A1A1AA; min-height:36px;">{m_desc}</p>
+                    <span style="font-size:12px; font-weight:700; color:#22C55E;">{m_xp}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            if st.button("Complete Now", key=f"comp_micro_{idx}", use_container_width=True):
+                p = st.session_state.user_profile
+                p["xp"] += val
+                if m_type == "water":
+                    p["today_mission"]["water"] = round(min(5.0, p["today_mission"]["water"] + change), 2)
+                elif m_type == "workout":
+                    p["today_mission"]["workout"] = change
+                elif m_type == "steps":
+                    p["today_mission"]["steps"] = min(50000, p["today_mission"]["steps"] + change)
+                st.toast(f"Completed: {m_title}! {m_xp} added! 🌟")
+                trigger_confetti()
+                st.rerun()
 
     st.markdown("---")
 
@@ -1301,12 +1364,39 @@ def show_ai_coach():
                 unsafe_allow_html=True
             )
             
+        # Suggestions chips (UX Improvement for AI Coach page suggestions)
+        st.markdown("<p style='font-size:12px; color:#A1A1AA; font-weight:600; margin-top:10px; margin-bottom:5px;'>💡 Quick suggestions:</p>", unsafe_allow_html=True)
+        sug_cols = st.columns(4)
+        suggestions = [
+            ("📊 Sleep Audit", "Review my sleep patterns this week"),
+            ("🍎 Calorie Macro", "Suggest a macro split for fat loss"),
+            ("🏃 Step Booster", "How can I hit 10k steps today?"),
+            ("🧘 Recovery Plan", "Recommend recovery exercises")
+        ]
+        for idx, (label, prompt_text) in enumerate(suggestions):
+            with sug_cols[idx]:
+                if st.button(label, key=f"sug_btn_{idx}", use_container_width=True):
+                    chat_history.append({"role": "user", "content": prompt_text})
+                    
+                    # Generate response based on active coach
+                    active = st.session_state.active_coach
+                    if active == "Nova":
+                        reply = "Alex, sleep data shows variance in deep sleep cycles. I recommend consistent lights-out times and a magnesium alignment post-workout."
+                    elif active == "Atlas":
+                        reply = "Let's focus on consistency, Alex! Hitting 10k steps is a great goal. Try breaking it down: a 10-minute walk after lunch gets you 1,200 steps easily!"
+                    elif active == "Titan":
+                        reply = "NO MORE OVERANALYZING! Hitting 10k steps means getting off your couch and moving! Go for a run right now! NO EXCUSES!"
+                    else: # Apex
+                        reply = "Macro allocation depends on intensity. For fat loss, target 2.0g protein/kg of lean body mass. Replenish glycogen index with complex carbs post HIIT."
+                        
+                    chat_history.append({"role": "coach", "content": reply})
+                    st.toast(f"Coach {active} responded!")
+                    st.rerun()
+
         chat_input = st.text_input("Consult your coach...", key="coach_chat_input", placeholder="Nova, review my sleep patterns this week...")
         if chat_input:
-            # Add user message
             chat_history.append({"role": "user", "content": chat_input})
             
-            # Simple AI responsive generator mock
             coach_reply = ""
             active = st.session_state.active_coach
             if active == "Nova":
@@ -1475,186 +1565,4 @@ def show_elite():
                 """
                 <div class="glass-card elite-card" style="text-align: center; padding: 25px; margin-top:20px;">
                     <h3 class="elite-glowing-text">👑 ELITE MEMBERSHIP ACTIVATED</h3>
-                    <p style="font-size:12px; color:#A1A1AA; margin-bottom:0;">Lifetime access is unlocked. Check out the Elite Analytics tab inside the Analytics module!</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        else:
-            coupon = st.text_input("Enter Elite Access Code", placeholder="REFRESH2026")
-            if st.button("ACTIVATE ELITE STATUS", use_container_width=True):
-                if coupon.strip() == "REFRESH2026":
-                    st.session_state.elite_unlocked = True
-                    st.toast("Elite Access Unlocked successfully! Welcome to the Arena 👑")
-                    trigger_confetti()
-                    st.rerun()
-                else:
-                    st.error("Invalid Promo Coupon Code. Please verify.")
-                    
-    with col2:
-        # Load and render generated image
-        st.markdown("### Elite Access Premium Emblem")
-        try:
-            st.image("elite_badge.png", caption="FITNESSFLIX ELITE MEMBERSHIP ACCREDITATION", use_container_width=True)
-        except Exception as e:
-            st.warning("EMBLEM LOADING PENDING...")
-
-
-# 18. SUB-PAGE 10: FITNESS WRAPPED (Spotify Wrapped Simulator)
-def show_wrapped():
-    st.markdown('<div class="cinematic-title">FITNESS WRAPPED</div>', unsafe_allow_html=True)
-    st.markdown("Inspired by Spotify Wrapped. Review your cumulative progress milestones for this challenge session.")
-    
-    # Wrapped slideshow
-    slides = [
-        {
-            "num": 1,
-            "title": "Welcome to Your Wrapped",
-            "stat": "EPISODE 2026",
-            "desc": "A visual recap of the grit, consistency, and metrics logged over the past 42 days."
-        },
-        {
-            "num": 2,
-            "title": "Workouts Completed",
-            "stat": "42 SESSIONS",
-            "desc": "You completed 100% of scheduled workout modules. Caloric burn estimates exceed 18,900 kcal!"
-        },
-        {
-            "num": 3,
-            "title": "Unbreakable Consistency",
-            "stat": "42 DAYS",
-            "desc": "A perfect daily streak score! You belong to the top 2% of international FitnessFlix members."
-        },
-        {
-            "num": 4,
-            "title": "Fitness Score Growth",
-            "stat": "+93% EVOLUTION",
-            "desc": "Your index grew from 45/100 baseline up to 87/100 peak performance score. Peak health optimization achieved."
-        },
-        {
-            "num": 5,
-            "title": "Your Primary Advisor",
-            "stat": "COACH NOVA",
-            "desc": "You queried Coach Nova the most this week for analytical calculations and macro alignments."
-        },
-        {
-            "num": 6,
-            "title": "Unlocked Athlete Rank",
-            "stat": "⚡ ELITE PERFORMER",
-            "desc": "Share your card with other athletes on the Community feed. Keep crushing your limits!"
-        }
-    ]
-    
-    curr_slide = st.session_state.wrapped_slide
-    slide_data = slides[curr_slide]
-    
-    # Render slide card using the wrapped-container styling
-    st.markdown(
-        f"""
-        <div class="wrapped-container">
-            <span style="font-size:12px; background:rgba(255,255,255,0.15); padding: 3px 12px; border-radius:20px; font-weight:700;">SLIDE {slide_data['num']} / {len(slides)}</span>
-            <h2 style="margin:15px 0 5px 0; font-size:2.2rem; font-family:'Poppins',sans-serif; text-transform:uppercase;">{slide_data['title']}</h2>
-            <div class="wrapped-stat-box">
-                <span class="wrapped-big-number">{slide_data['stat']}</span>
-            </div>
-            <p style="color:#E2E8F0; font-size:14px; max-width:480px; margin: 0 auto; line-height:1.5;">{slide_data['desc']}</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    # Slide controllers
-    ctrl_cols = st.columns([1, 1, 1])
-    with ctrl_cols[0]:
-        if st.button("⬅️ PREVIOUS SLIDE", disabled=(curr_slide == 0), use_container_width=True):
-            st.session_state.wrapped_slide -= 1
-            st.rerun()
-    with ctrl_cols[1]:
-        if st.button("🎁 EXPLODE PARTY", use_container_width=True):
-            trigger_confetti()
-    with ctrl_cols[2]:
-        if st.button("NEXT SLIDE ➡️", disabled=(curr_slide == len(slides) - 1), use_container_width=True):
-            st.session_state.wrapped_slide += 1
-            st.rerun()
-            
-    # Reset button if on last slide
-    if curr_slide == len(slides) - 1:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("REPLAY WRAPPED SUMMARY JOURNEY", use_container_width=True):
-            st.session_state.wrapped_slide = 0
-            st.rerun()
-
-
-# 19. SUB-PAGE 11: SETTINGS & EXPORT DATA
-def show_settings():
-    st.markdown('<div class="cinematic-title">SYSTEM SETTINGS</div>', unsafe_allow_html=True)
-    st.markdown("Configure target thresholds, UI parameter themes, and database operations.")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### Profile Settings")
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        user_name = st.text_input("Change Profile Name", value=st.session_state.user_profile["name"])
-        if user_name != st.session_state.user_profile["name"]:
-            st.session_state.user_profile["name"] = user_name
-            st.toast("Profile Name updated!")
-            st.rerun()
-            
-        st.markdown("<br><b>Target Goals Configuration:</b>", unsafe_allow_html=True)
-        target_calories = st.number_input("Target Calorie Intake (kcal)", min_value=1200, max_value=5000, value=2200, step=100)
-        target_steps = st.number_input("Target Daily Steps (steps)", min_value=4000, max_value=30000, value=10000, step=500)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    with col2:
-        st.markdown("### Themes & Data Operations")
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        
-        theme_sel = st.selectbox("Application Visual Theme", ["Stealth Black (Default)", "Luxury Gold", "Neon Nebula (Purple)", "Cyber Cyberpunk"])
-        st.info(f"Visual Theme applied: {theme_sel}")
-        
-        # Export Data to CSV
-        st.markdown("<br><b>Data Operations:</b>", unsafe_allow_html=True)
-        history_df = st.session_state.history_df
-        csv_data = history_df.to_csv(index=False).encode('utf-8')
-        
-        st.download_button(
-            label="📤 EXPORT WORKOUT HISTORY AS CSV",
-            data=csv_data,
-            file_name="fitnessflix_history_export.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-
-
-# 20. PAGE NAVIGATION ROUTER
-page = st.session_state.current_page
-if page == "Home":
-    show_home()
-elif page == "My Journey":
-    # Let's render Daily Mission checklist and Advanced Analytics together using subtabs
-    subtab1, subtab2 = st.tabs(["🎯 Today's Mission Episodes", "📊 Advanced Analytics Dashboard"])
-    with subtab1:
-        show_my_journey()
-    with subtab2:
-        show_analytics()
-elif page == "Challenges":
-    show_challenges()
-elif page == "Arena":
-    show_arena()
-elif page == "Community":
-    show_community()
-elif page == "Leaderboard":
-    show_leaderboard()
-elif page == "AI Coach":
-    show_ai_coach()
-elif page == "Profile":
-    show_profile()
-elif page == "Elite Badge":
-    show_elite()
-elif page == "Wrapped":
-    show_wrapped()
-elif page == "Settings":
-    show_settings()
+                    <p style="font-size:12px; color:#A1A1AA; margin-bottom:0;">Lifetime access is unlocked. Check out the Elite 
