@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
 import datetime
 import time
 import base64
+import math
 from io import BytesIO
 from PIL import Image
 
@@ -59,6 +58,156 @@ def trigger_confetti():
         height=0,
         width=0,
     )
+
+# --- SVG Custom Charts (Zero-Dependency Charting) ---
+def draw_svg_gauge(score, color_hex):
+    pct = score / 100.0
+    offset = 502.6 * (1.0 - pct)
+    svg = f"""
+    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+    <svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;">
+        <!-- Background track -->
+        <circle cx="100" cy="100" r="80" stroke="rgba(255, 255, 255, 0.05)" stroke-width="14" fill="none"/>
+        
+        <!-- Active track -->
+        <circle cx="100" cy="100" r="80" stroke="{color_hex}" stroke-width="14" 
+                stroke-dasharray="502.6" stroke-dashoffset="{offset}" stroke-linecap="round" fill="none" 
+                transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 8px {color_hex}); transition: stroke-dashoffset 0.5s ease;"/>
+                
+        <!-- Inner Details -->
+        <text x="100" y="85" fill="#A1A1AA" font-size="10" font-family="'Poppins', sans-serif" font-weight="600" text-anchor="middle" letter-spacing="1">FITNESS SCORE</text>
+        <text x="100" y="130" fill="#FFFFFF" font-size="42" font-family="'Poppins', sans-serif" font-weight="800" text-anchor="middle">{score}</text>
+        <text x="100" y="150" fill="{color_hex}" font-size="11" font-family="'Poppins', sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.5">/ 100 PTS</text>
+    </svg>
+    </div>
+    """
+    return svg
+
+def draw_activity_rings(mission):
+    workout_pct = 1.0 if mission["workout"] else 0.1
+    water_pct = min(1.0, mission["water"] / 3.0)
+    sleep_pct = min(1.0, mission["sleep"] / 8.0)
+    steps_pct = min(1.0, mission["steps"] / 10000)
+    
+    steps_offset = 502.6 * (1.0 - steps_pct)
+    workout_offset = 408.4 * (1.0 - workout_pct)
+    water_offset = 314.2 * (1.0 - water_pct)
+    sleep_offset = 219.9 * (1.0 - sleep_pct)
+    
+    html = f"""
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
+        <svg width="220" height="220" viewBox="0 0 200 200" style="background:transparent;">
+            <!-- Steps Ring (Green) -->
+            <circle cx="100" cy="100" r="80" stroke="rgba(34, 197, 94, 0.08)" stroke-width="12" fill="none"/>
+            <circle cx="100" cy="100" r="80" stroke="#22C55E" stroke-width="12" stroke-dasharray="502.6" stroke-dashoffset="{steps_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #22C55E);"/>
+            
+            <!-- Workout Ring (Purple) -->
+            <circle cx="100" cy="100" r="65" stroke="rgba(124, 58, 237, 0.08)" stroke-width="12" fill="none"/>
+            <circle cx="100" cy="100" r="65" stroke="#7C3AED" stroke-width="12" stroke-dasharray="408.4" stroke-dashoffset="{workout_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #7C3AED);"/>
+            
+            <!-- Hydration Ring (Cyan) -->
+            <circle cx="100" cy="100" r="50" stroke="rgba(0, 212, 255, 0.08)" stroke-width="12" fill="none"/>
+            <circle cx="100" cy="100" r="50" stroke="#00D4FF" stroke-width="12" stroke-dasharray="314.2" stroke-dashoffset="{water_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #00D4FF);"/>
+            
+            <!-- Sleep Ring (Yellow) -->
+            <circle cx="100" cy="100" r="35" stroke="rgba(234, 179, 8, 0.08)" stroke-width="12" fill="none"/>
+            <circle cx="100" cy="100" r="35" stroke="#EAB308" stroke-width="12" stroke-dasharray="219.9" stroke-dashoffset="{sleep_offset}" stroke-linecap="round" fill="none" transform="rotate(-90 100 100)" style="filter: drop-shadow(0 0 4px #EAB308);"/>
+        </svg>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; justify-content: center; font-size: 11px;">
+            <span style="color:#22C55E;">● Steps ({int(steps_pct*100)}%)</span>
+            <span style="color:#7C3AED;">● Workout ({int(workout_pct*100)}%)</span>
+            <span style="color:#00D4FF;">● Water ({int(water_pct*100)}%)</span>
+            <span style="color:#EAB308;">● Sleep ({int(sleep_pct*100)}%)</span>
+        </div>
+    </div>
+    """
+    return html
+
+def draw_svg_radar(values):
+    labels = ["Workouts", "Hydration", "Calories", "Sleep", "Steps", "Consistency"]
+    cx, cy = 100, 100
+    r_max = 70
+    
+    grid_polygons = []
+    for pct in [0.25, 0.50, 0.75, 1.0]:
+        rg = r_max * pct
+        g_pts = []
+        for i in range(6):
+            angle = i * (math.pi / 3) - (math.pi / 2)
+            gx = cx + rg * math.cos(angle)
+            gy = cy + rg * math.sin(angle)
+            g_pts.append(f"{gx:.1f},{gy:.1f}")
+        grid_polygons.append(f'<polygon points="{" ".join(g_pts)}" stroke="rgba(255,255,255,0.08)" fill="none" stroke-width="1"/>')
+        
+    active_pts = []
+    label_elements = []
+    for i in range(6):
+        angle = i * (math.pi / 3) - (math.pi / 2)
+        val = values[i]
+        px = cx + (r_max * (val / 100.0)) * math.cos(angle)
+        py = cy + (r_max * (val / 100.0)) * math.sin(angle)
+        active_pts.append(f"{px:.1f},{py:.1f}")
+        
+        ax_end_x = cx + r_max * math.cos(angle)
+        ax_end_y = cy + r_max * math.sin(angle)
+        grid_polygons.append(f'<line x1="{cx}" y1="{cy}" x2="{ax_end_x:.1f}" y2="{ax_end_y:.1f}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>')
+        
+        lbl_x = cx + (r_max + 18) * math.cos(angle)
+        lbl_y = cy + (r_max + 10) * math.sin(angle)
+        if abs(math.cos(angle)) < 0.1:
+            anchor = "middle"
+        elif math.cos(angle) > 0:
+            anchor = "start"
+        else:
+            anchor = "end"
+            
+        label_elements.append(f'<text x="{lbl_x:.1f}" y="{lbl_y+4:.1f}" fill="#A1A1AA" font-size="9" font-family="Inter" font-weight="600" text-anchor="{anchor}">{labels[i]}</text>')
+        
+    active_poly = f'<polygon points="{" ".join(active_pts)}" fill="rgba(0, 212, 255, 0.15)" stroke="#00D4FF" stroke-width="2" style="filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.4));"/>'
+    
+    svg = f"""
+    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+    <svg width="240" height="240" viewBox="0 0 200 200" style="background:transparent;">
+        {"".join(grid_polygons)}
+        {active_poly}
+        {"".join(label_elements)}
+    </svg>
+    </div>
+    """
+    return svg
+
+def draw_svg_heatmap(grid_values):
+    colors = ["#3F3F46", "#7C3AED", "#00D4FF", "#22C55E"]
+    labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    
+    rects = []
+    box_w = 20
+    box_h = 20
+    gap = 4
+    
+    headers = []
+    for idx, day in enumerate(labels):
+        x = idx * (box_w + gap) + 30
+        headers.append(f'<text x="{x + box_w/2}" y="15" fill="#A1A1AA" font-size="8" font-family="Inter" text-anchor="middle" font-weight="600">{day}</text>')
+        
+    for r_idx in range(4):
+        y = r_idx * (box_h + gap) + 25
+        rects.append(f'<text x="5" y="{y + box_h/2 + 3}" fill="#A1A1AA" font-size="8" font-family="Inter" font-weight="600">W-{3-r_idx}</text>')
+        for c_idx in range(7):
+            val = grid_values[r_idx][c_idx]
+            color = colors[val]
+            x = c_idx * (box_w + gap) + 30
+            rects.append(f'<rect x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="3" fill="{color}"><title>Status: {val}</title></rect>')
+            
+    svg = f"""
+    <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+    <svg width="220" height="130" viewBox="0 0 200 130" style="background:transparent;">
+        {"".join(headers)}
+        {"".join(rects)}
+    </svg>
+    </div>
+    """
+    return svg
 
 # 4. Initialize Session State
 def init_state():
@@ -539,40 +688,10 @@ def show_my_journey():
         elif f_score >= 50:
             score_color = "#EAB308" # yellow
             
-        # Draw a beautiful radial / gauge chart using Plotly
-        fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = f_score,
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            title = {'text': "MASTER FITNESS SCORE", 'font': {'size': 20, 'color': '#FFFFFF', 'family': 'Poppins'}},
-            gauge = {
-                'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "#FFFFFF"},
-                'bar': {'color': score_color},
-                'bgcolor': "rgba(255, 255, 255, 0.05)",
-                'borderwidth': 2,
-                'bordercolor': "rgba(255, 255, 255, 0.1)",
-                'steps': [
-                    {'range': [0, 50], 'color': 'rgba(239, 68, 68, 0.08)'},
-                    {'range': [50, 85], 'color': 'rgba(0, 212, 255, 0.08)'},
-                    {'range': [85, 100], 'color': 'rgba(34, 197, 94, 0.08)'}
-                ],
-                'threshold': {
-                    'line': {'color': "#FFD700", 'width': 4},
-                    'thickness': 0.75,
-                    'value': 90
-                }
-            }
-        ))
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font={'color': "#FFFFFF", 'family': "Inter"},
-            height=340,
-            margin=dict(l=20, r=20, t=60, b=20)
-        )
-        
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.plotly_chart(fig, use_container_width=True)
+        # Draw a beautiful radial / gauge chart using SVG
+        gauge_svg = draw_svg_gauge(f_score, score_color)
+        st.markdown(gauge_svg, unsafe_allow_html=True)
         
         st.markdown(
             f"""
@@ -611,15 +730,14 @@ def show_my_journey():
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-# 10. ADVANCED ANALYTICS (Plotly Charts Subpage)
+# 10. ADVANCED ANALYTICS (Zero-Dependency Custom Native & SVG Dashboard)
 def show_analytics():
     st.markdown('<div class="cinematic-title">ATHLETE ANALYTICS</div>', unsafe_allow_html=True)
     
-    # Let's check history dataframe
     df = st.session_state.history_df
+    chart_df = df.copy().set_index("Date")
     
     # Free users see the first 4 charts, remainder are hidden behind the Elite Lock
-    # Tab selector for categorising charts
     anal_tab1, anal_tab2 = st.tabs(["📈 General Analytics", "🔒 Elite Pro Analytics"])
     
     with anal_tab1:
@@ -629,85 +747,28 @@ def show_analytics():
         # Chart 1: Fitness Progress Trend (Line Chart)
         with col_c1:
             st.markdown("#### 1. Fitness Score Evolution")
-            fig1 = px.area(
-                df, x="Date", y="Fitness Score",
-                title="Historical Fitness Score (Past 30 Days)",
-                color_discrete_sequence=["#00D4FF"]
-            )
-            fig1.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color="#FFFFFF",
-                yaxis=dict(range=[20, 100], gridcolor="rgba(255,255,255,0.05)"),
-                xaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-            )
-            st.plotly_chart(fig1, use_container_width=True)
+            st.area_chart(chart_df["Fitness Score"])
             
         # Chart 2: Weekly Workout Bar Chart
         with col_c2:
             st.markdown("#### 2. Weekly Activity Minutes")
-            # Get last 7 days
             weekly_df = df.tail(7).copy()
             weekly_df["Day"] = [d.strftime("%a") for d in weekly_df["Date"]]
-            fig2 = px.bar(
-                weekly_df, x="Day", y="Active Mins",
-                color="Calories",
-                title="Active Mins vs Estimated Calorie Burn",
-                color_continuous_scale=["#7C3AED", "#00D4FF"]
-            )
-            fig2.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color="#FFFFFF",
-                coloraxis_colorbar=dict(title="kcal"),
-                yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-            )
-            st.plotly_chart(fig2, use_container_width=True)
+            st.bar_chart(weekly_df.set_index("Day")[["Active Mins", "Calories"]])
             
         col_c3, col_c4 = st.columns(2)
         
-        # Chart 3: Goal Completion Donut Chart
+        # Chart 3: Goal Completion Donut Chart (Apple Concentric Circles)
         with col_c3:
             st.markdown("#### 3. Today's Target Allocations")
             mission = st.session_state.user_profile["today_mission"]
-            labels = ["Workout Duration", "Hydration Volume", "Calorie Balance", "Sleep Duration", "Steps Logged"]
-            # Percentages
-            values = [
-                100 if mission["workout"] else 10,
-                min(100, int((mission["water"]/3.0)*100)),
-                min(100, int((1.0 - abs(mission["nutrition"]-2200)/2200)*100)),
-                min(100, int((mission["sleep"]/8.0)*100)),
-                min(100, int((mission["steps"]/10000)*100))
-            ]
-            fig3 = px.pie(
-                names=labels, values=values, hole=0.6,
-                title="Goal Share Balance",
-                color_discrete_sequence=["#7C3AED", "#00D4FF", "#22C55E", "#FFD700", "#EAB308"]
-            )
-            fig3.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color="#FFFFFF"
-            )
-            st.plotly_chart(fig3, use_container_width=True)
+            st.markdown(draw_activity_rings(mission), unsafe_allow_html=True)
             
         # Chart 4: Monthly Active Minutes Area Chart
         with col_c4:
             st.markdown("#### 4. Cumulative Active Minutes")
             df["Cumulative Active Mins"] = df["Active Mins"].cumsum()
-            fig4 = px.area(
-                df, x="Date", y="Cumulative Active Mins",
-                title="Cumulative Cardio Load Evolution",
-                color_discrete_sequence=["#22C55E"]
-            )
-            fig4.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color="#FFFFFF",
-                yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                xaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-            )
-            st.plotly_chart(fig4, use_container_width=True)
+            st.area_chart(df.copy().set_index("Date")["Cumulative Active Mins"])
             
     with anal_tab2:
         # Check Elite Access
@@ -735,150 +796,75 @@ def show_analytics():
             # Chart 5: Radar Chart (Dimension Balance)
             with col_e1:
                 st.markdown("#### 5. Radar Dimension Balance")
-                # Mean of last week
                 recent = df.tail(7)
-                categories = ["Workouts", "Hydration", "Calories Balance", "Sleep Quality", "Steps Volume", "Consistency"]
-                # Normalise to 100
                 radar_vals = [
                     90,  # Workouts
-                    min(100, int((recent["Water"].mean() / 3.0) * 100)),
-                    min(100, int((1.0 - abs(recent["Calories"].mean() - 2200)/2200)*100)),
-                    min(100, int((recent["Sleep"].mean() / 8.0) * 100)),
-                    min(100, int((recent["Steps"].mean() / 10000) * 100)),
+                    int(min(100, (recent["Water"].mean() / 3.0) * 100)),
+                    int(min(100, (1.0 - abs(recent["Calories"].mean() - 2200)/2200)*100)),
+                    int(min(100, (recent["Sleep"].mean() / 8.0) * 100)),
+                    int(min(100, (recent["Steps"].mean() / 10000) * 100)),
                     87  # Consistency index
                 ]
-                
-                fig5 = go.Figure()
-                fig5.add_trace(go.Scatterpolar(
-                    r=radar_vals,
-                    theta=categories,
-                    fill='toself',
-                    fillcolor='rgba(0, 212, 255, 0.2)',
-                    line=dict(color='#00D4FF', width=2),
-                    name='Alex Mercer'
-                ))
-                fig5.update_layout(
-                    polar=dict(
-                        radialaxis=dict(visible=True, range=[0, 100], color="#FFFFFF", gridcolor="rgba(255,255,255,0.1)"),
-                        angularaxis=dict(color="#FFFFFF", gridcolor="rgba(255,255,255,0.1)")
-                    ),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF",
-                    title="7-Day Performance Balance"
-                )
-                st.plotly_chart(fig5, use_container_width=True)
+                st.markdown(draw_svg_radar(radar_vals), unsafe_allow_html=True)
                 
             # Chart 6: Habit Heatmap
             with col_e2:
                 st.markdown("#### 6. 28-Day Habit Heatmap")
-                # 4 weeks x 7 days grid of completion
-                grid_vals = np.random.choice([0, 1, 2, 3], size=(4, 7), p=[0.1, 0.15, 0.35, 0.4])
-                # 0: Missed, 1: Low, 2: Active, 3: Perfect
-                days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                weeks = ["Week -3", "Week -2", "Week -1", "Current"]
-                fig6 = px.imshow(
-                    grid_vals,
-                    labels=dict(x="Day of Week", y="Week", color="Metric status"),
-                    x=days,
-                    y=weeks,
-                    color_continuous_scale=["#3F3F46", "#7C3AED", "#00D4FF", "#22C55E"],
-                    title="Daily Completion Grade Heatmap"
-                )
-                fig6.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF"
-                )
-                st.plotly_chart(fig6, use_container_width=True)
+                grid_vals = [
+                    [3, 2, 3, 0, 1, 2, 3],
+                    [2, 3, 2, 3, 1, 0, 2],
+                    [3, 3, 2, 2, 3, 2, 3],
+                    [3, 2, 3, 2, 1, 2, 3]
+                ]
+                st.markdown(draw_svg_heatmap(grid_vals), unsafe_allow_html=True)
                 
             col_e3, col_e4 = st.columns(2)
             
             # Chart 7: Streak Forecast
             with col_e3:
                 st.markdown("#### 7. Streak Forecast Simulator")
-                # Project 14 days into future
                 future_dates = [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 15)]
                 curr_score = st.session_state.user_profile["fitness_score"]
-                # 3 lines: perfect compliance, moderate compliance, relapsing
                 perf_prog = [min(100, curr_score + (i * 0.9)) for i in range(1, 15)]
-                mod_prog = [max(40, min(100, curr_score + np.sin(i*0.5)*3)) for i in range(1, 15)]
+                mod_prog = [max(40, min(100, curr_score + math.sin(i*0.5)*3)) for i in range(1, 15)]
                 rel_prog = [max(30, curr_score - (i * 1.5)) for i in range(1, 15)]
                 
-                fig7 = go.Figure()
-                fig7.add_trace(go.Scatter(x=future_dates, y=perf_prog, name="Perfect Streak (100% Habit)", line=dict(color="#22C55E", width=3)))
-                fig7.add_trace(go.Scatter(x=future_dates, y=mod_prog, name="Standard Pacing (75% Habit)", line=dict(color="#00D4FF", width=2, dash="dash")))
-                fig7.add_trace(go.Scatter(x=future_dates, y=rel_prog, name="Missed Sessions (Relapse)", line=dict(color="#EF4444", width=2, dash="dot")))
-                fig7.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF",
-                    title="14-Day Fitness Score Forecast",
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-                )
-                st.plotly_chart(fig7, use_container_width=True)
+                forecast_df = pd.DataFrame({
+                    "Perfect Streak": perf_prog,
+                    "Standard Pacing": mod_prog,
+                    "Missed Sessions": rel_prog
+                }, index=future_dates)
+                st.line_chart(forecast_df)
                 
             # Chart 8: AI weight/muscle prediction chart
             with col_e4:
                 st.markdown("#### 8. AI Body Composition Projection")
-                hist_days = list(range(30))
-                fut_days = list(range(30, 37))
-                
                 weight_hist = df["Weight"].tolist()
-                # Simple project regression
                 slope = -0.13
                 weight_proj = [weight_hist[-1] + slope * i for i in range(1, 8)]
                 
-                fig8 = go.Figure()
-                fig8.add_trace(go.Scatter(x=hist_days, y=weight_hist, name="Weight History (kg)", line=dict(color="#7C3AED")))
-                fig8.add_trace(go.Scatter(x=fut_days, y=weight_proj, name="AI Weight Forecast (7 Days)", line=dict(color="#FFD700", width=2, dash="dash")))
-                fig8.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF",
-                    title="Weight & Muscle Tissue Forecasting",
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-                )
-                st.plotly_chart(fig8, use_container_width=True)
+                body_df = pd.DataFrame({
+                    "Weight History (kg)": [weight_hist[i] if i < 30 else None for i in range(37)],
+                    "AI Forecast": [None]*30 + weight_proj
+                }, index=[f"Day {i}" for i in range(37)])
+                st.line_chart(body_df)
                 
             col_e5, col_e6 = st.columns(2)
             
             # Chart 9: Fitness Score Evolution comparison
             with col_e5:
                 st.markdown("#### 9. Score Comparative Percentiles")
-                # User vs national avg vs top 10%
-                fig9 = go.Figure()
-                fig9.add_trace(go.Scatter(x=df["Date"], y=df["Fitness Score"], name="Alex Mercer (You)", line=dict(color="#00D4FF", width=3)))
-                fig9.add_trace(go.Scatter(x=df["Date"], y=[68]*30, name="Global Average Elite", line=dict(color="#A1A1AA", width=1.5, dash="dash")))
-                fig9.add_trace(go.Scatter(x=df["Date"], y=[90]*30, name="Top 5% Threshold", line=dict(color="#FFD700", width=1.5, dash="dot")))
-                fig9.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF",
-                    title="Global Cohort Comparison",
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-                )
-                st.plotly_chart(fig9, use_container_width=True)
+                cohort_df = pd.DataFrame({
+                    "Alex Mercer (You)": df["Fitness Score"].tolist(),
+                    "Global Average": [68]*30,
+                    "Top 5% Threshold": [90]*30
+                }, index=df["Date"])
+                st.line_chart(cohort_df)
                 
-            # Chart 10: Consistency Box Plot
+            # Chart 10: Workout Consistency Over Time
             with col_e6:
-                st.markdown("#### 10. Workout Consistency Variance")
-                # durations of workouts
-                fig10 = px.box(
-                    df, y="Active Mins",
-                    title="Active Minutes Duration Spread",
-                    color_discrete_sequence=["#7C3AED"]
-                )
-                fig10.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font_color="#FFFFFF",
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-                )
-                st.plotly_chart(fig10, use_container_width=True)
+                st.markdown("#### 10. Workout Consistency Over Time")
+                st.bar_chart(chart_df["Active Mins"])
 
 
 # 11. SUB-PAGE 3: CHALLENGES & AI GENERATOR
